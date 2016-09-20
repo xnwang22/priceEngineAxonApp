@@ -18,9 +18,12 @@ package com.myproject.axom.priceengine.init;
 
 import com.myproject.axom.priceengine.api.CreateProductsCommand;
 import com.myproject.axom.priceengine.api.RegisterPriceCommand;
+import com.myproject.axom.priceengine.command.ProductsLoadCompletedEvent;
 import org.axonframework.commandhandling.CommandBus;
 import org.axonframework.commandhandling.GenericCommandMessage;
 
+import org.axonframework.commandhandling.gateway.CommandGateway;
+import org.axonframework.commandhandling.gateway.DefaultCommandGateway;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -56,6 +59,8 @@ public class ProductGenerator implements ApplicationListener {
         try {
             loadProducts();
             loadPriceDetails();
+            CommandGateway commandGateway = new DefaultCommandGateway(commandBus);
+            commandGateway.send(new ProductsLoadCompletedEvent());
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -1,6 +1,8 @@
 package com.myproject.axom.priceengine;
 
 import com.myproject.axom.priceengine.api.CreateProductsCommand;
+import com.myproject.axom.priceengine.command.ProductsLoadCompletedEvent;
+import com.myproject.axom.priceengine.init.ProductGenerator;
 import com.myproject.axom.priceengine.query.PriceEntry;
 import com.myproject.axom.priceengine.query.PriceQuery;
 import com.myproject.axom.priceengine.query.ProductEntry;
@@ -11,6 +13,8 @@ import org.axonframework.commandhandling.GenericCommandMessage;
 import org.axonframework.commandhandling.SimpleCommandBus;
 
 import com.myproject.axom.priceengine.api.RegisterPriceCommand;
+import org.axonframework.commandhandling.gateway.CommandGateway;
+import org.axonframework.commandhandling.gateway.DefaultCommandGateway;
 import org.axonframework.eventhandling.EventBus;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -32,29 +36,19 @@ public class PriceEngineApp {
 
     public static void main(String[] args) {
         ApplicationContext context = new ClassPathXmlApplicationContext("classpath:/META-INF/spring/application-context.xml",
-                "classpath:/META-INF/spring/database-context.xml");
+                "classpath:/META-INF/spring/database-context.xml", "classpath:/META-INF/spring/datainit-context.xml");
 
         PriceEngineApp theApp = new PriceEngineApp();
         EventBus eventBus = (EventBus) context.getBean("eventBus");
+        ProductGenerator productGenerator = (ProductGenerator) context.getBean("productGenerator");
         theApp.commandBus = (CommandBus) context.getBean("commandBus"); //new SimpleCommandBus();
-        try {
-            theApp.loadProducts();
-            theApp.loadPriceDetails();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        ProductRepository queryProductRepository = (ProductRepository) context.getBean("queryProductRepository");
-        List<ProductEntry> productList = queryProductRepository.findAllProducts();
-        for (ProductEntry product : productList)
-        {
-            PriceQuery priceResult = queryProductRepository.findFrequentPriceForProduct(product.getName());
-            System.out.println(MarketPriceRules.applyRule(product.getMarket(), priceResult.getPrice()));
-        }
+//        try {
+//            theApp.loadProducts();
+//            theApp.loadPriceDetails();
+//            theApp.commandBus.dispatch();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
 
     }
     private void loadProducts() throws IOException{
@@ -79,6 +73,7 @@ public class PriceEngineApp {
             commandBus.dispatch(new GenericCommandMessage<Object>(command));
 
         }
+
 
     }
 

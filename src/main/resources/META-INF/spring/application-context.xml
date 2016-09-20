@@ -38,4 +38,6 @@
         <property name="repository" ref="productRepository"/>
     </bean>
 
+    <bean class="com.myproject.axom.priceengine.command.ProductsLoadCompleteEventHandler"/>
+
 </beans>

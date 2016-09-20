@@ -27,6 +27,12 @@ public class CreateProductsCommand extends AbstractOrderCommand {
     private String productName;
     private String market;
 
+   /* public CreateProductsCommand(String name, String market) {
+
+        this.productName = name;
+        this.market = market;
+    }*/
+
 
     public void setProductName(String productName) {
         Assert.hasText(productName, "Name for new product package must contain text");
